@@ -1,0 +1,115 @@
+<?php
+session_start();
+
+// 1. Security Check: Redirect to Login if not logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// 2. Get User Name (default to "Fan" if missing)
+$user_name = isset($_SESSION['first_name']) ? htmlspecialchars($_SESSION['first_name']) : "Fan";
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Venue App</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Card Hover Effects */
+        .card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s;
+        }
+        .card-link:hover {
+            transform: translateY(-5px);
+        }
+        /* Icon styling */
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        /* Grid Layout for 4 Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    
+    <nav>
+        <a href="index.php" class="active">Home</a>
+        <a href="users.php">Users List</a>        <a href="concessions.php">Mobile Order</a> 
+        <a href="friends.php">Find Friends</a>    
+        <a href="project.php">About Project</a>
+        <a href="team.php">About Us</a>
+	<a href="maps.php">Maps</a>
+	<a href="maps.php">Maps</a>
+        <a href="logout.php" style="float: right;">Logout</a>
+    </nav>
+
+    <div class="hero-banner">
+        <h1>Hello, <?php echo $user_name; ?>!</h1>
+        <p>Welcome to FanFest, your Stadium Command Center.</p>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="dashboard-grid">
+            
+            <a href="friends.php" class="card-link">
+                <div class="card" style="text-align: center; height: 100%;">
+                    <div class="card-icon">📍</div>
+                    <h3>Find Friends</h3>
+                    <p>See who is at the stadium and connect.</p>
+                </div>
+            </a>
+
+            <a href="concessions.php" class="card-link">
+                <div class="card" style="text-align: center; height: 100%;">
+                    <div class="card-icon">🌭</div>
+                    <h3>Mobile Order</h3>
+                    <p>Skip the line. Order food directly to your seat.</p>
+                </div>
+            </a>
+
+            <a href="checkin.php" class="card-link">
+                <div class="card" style="text-align: center; height: 100%;">
+                    <div class="card-icon">🏆</div>
+                    <h3>Check In</h3>
+                    <p>Verify your location and earn attendance badges.</p>
+                </div>
+            </a>
+
+            <a href="lightshow.php" class="card-link">
+                <div class="card" style="text-align: center; height: 100%;">
+                    <div class="card-icon">✨</div>
+                    <h3>Light Show</h3>
+                    <p>Sync your phone for the live stadium light show.</p>
+                </div>
+            </a>
+
+        </div>
+
+        <div class="card" style="margin-top: 40px;">
+            <h3>Current Status</h3>
+            <p>
+                You are successfully logged into the prototype system. All systems (Database, Session, and Geolocation) are active.
+            </p>
+        </div>
+    </div>
+    
+    <footer style="text-align: center; margin-top: 50px; padding: 20px; font-size: 0.8em; color: #aaa;">
+        <p>&copy; 2025 Venue App Prototype</p>
+    </footer>
+
+</body>
+</html>
+

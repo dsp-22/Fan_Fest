@@ -1,0 +1,48 @@
+<?php
+$google_maps_api_key = "AIzaSyCGFAIZP5RJuffIIDpjou9vqeBfQPIxmHc";
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Map</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.php">Home</a>
+        <a href="users.php">Users List</a>
+        <a href="concessions.php">Mobile Order</a>
+        <a href="friends.php">Find Friends</a>
+        <a href="project.php">About Project</a>
+        <a href="team.php">About Us</a>
+        <a href="maps.php" class="active">Maps</a>
+        <a href="logout.php" style="float: right;">Logout</a>
+    </nav>
+
+    <div id="map"></div>
+
+    <script>
+        // Initialize the map
+        function initMap() {
+            const bloomington = { lat: 39.1653, lng: -86.5264 };
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 14,
+                center: bloomington
+            });
+            new google.maps.Marker({ position: bloomington, map: map });
+        }
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $google_maps_api_key; ?>&callback=initMap" async defer></script>
+</body>
+</html>

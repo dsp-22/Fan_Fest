@@ -1,0 +1,6 @@
+# Exclude sensitive environment variables
+.env
+
+# Exclude temporary server logs and files
+last_game_import.txt
+.DS_Store

@@ -1,0 +1,213 @@
+/* style.css - The Master Theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+    color: #2d3436;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* NAVIGATION */
+nav {
+    background: white;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 0;
+    /* Flush with whatever comes next */
+}
+
+nav a {
+    text-decoration: none;
+    color: #636e72;
+    margin: 0 15px;
+    font-weight: 500;
+    font-size: 0.95em;
+    transition: color 0.2s;
+}
+
+nav a:hover {
+    color: #0984e3;
+}
+
+/* HERO BANNER (The Blue Header) */
+.hero-banner {
+    background: linear-gradient(135deg, #0984e3, #6c5ce7);
+    color: white;
+    padding: 60px 20px 100px 20px;
+    /* Extra padding bottom for overlap */
+    text-align: center;
+    margin-bottom: -60px;
+    /* Pulls content up */
+}
+
+.hero-banner h1 {
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.hero-banner p {
+    opacity: 0.9;
+    margin-top: 10px;
+    font-weight: 300;
+}
+
+/* LAYOUT CONTAINERS */
+.main-container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto 50px auto;
+    position: relative;
+    z-index: 2;
+}
+
+.narrow-container {
+    max-width: 500px;
+}
+
+/* For Login page */
+
+/* CARD DESIGN */
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
+
+/* FORMS & BUTTONS */
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 20px 0;
+    border: 1px solid #dfe6e9;
+    border-radius: 6px;
+    box-sizing: border-box;
+    /* Fixes padding issues */
+}
+
+button,
+.btn {
+    background-color: #0984e3;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background-color: #74b9ff;
+}
+
+/* TABLES (For Users Page) */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    padding: 15px;
+    border-bottom: 2px solid #eee;
+    color: #0984e3;
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid #f1f2f6;
+}
+
+
+
+.concession-item {
+    border-left: 5px solid #0984e3;
+    background: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* match purple in banner for hover */
+.btn-add:hover {
+    background-color: #6c5ce7 !important;
+    transform: translateY(-2px);
+    transition: 0.2s;
+}
+
+
+/* IU Theme Overrides */
+body.theme-iu {
+    background-color: #f4e1e1;
+}
+
+body.theme-iu .hero-banner {
+    background: linear-gradient(135deg, #990000 0%, #660000 100%);
+}
+
+body.theme-iu .profile-card {
+    border-left: 5px solid #990000;
+}
+
+/* Purdue Theme Overrides */
+body.theme-purdue {
+    background-color: #f4f1e1;
+}
+
+body.theme-purdue .hero-banner {
+    background: linear-gradient(135deg, #ceb888 0%, #000000 100%);
+}
+
+body.theme-purdue .profile-card {
+    border-left: 5px solid #ceb888;
+}
+
+/* Profile Dashboard Styling */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Theme integration for the new sidebar */
+body.theme-iu .profile-pic-container {
+    border-color: #990000;
+}
+
+body.theme-iu h2 {
+    color: #990000;
+}
+
+body.theme-purdue .profile-pic-container {
+    border-color: #ceb888;
+}
+
+body.theme-purdue h2 {
+    color: #ceb888;
+}
+
+.btn-cancel {
+    background: #f1f2f6;
+    color: #b2bec3;
+    border: 1px solid #dfe6e9;
+}
+
+.btn-cancel:hover {
+    background: #fab1a0;
+    color: #d63031;
+    border-color: #fab1a0;
+}
