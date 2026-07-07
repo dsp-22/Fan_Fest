@@ -1,48 +1,61 @@
 <?php
-set_time_limit(0); // Allow this to run for a long time
+set_time_limit(0);
 require 'db_connect.php';
 
-// 1. Fetch all events
 $events = $conn->query("SELECT event_id, event_date, latitude, longitude FROM events");
-
 if (!$events) { die("No events found."); }
 
+$batch_size = 500; // Insert 500 fans at a time
 $total_inserted = 0;
+
+$conn->query("START TRANSACTION");
 
 while ($row = $events->fetch_assoc()) {
     $e_id = $row['event_id'];
-    $date = new DateTime($row['event_date']);
-    $now  = new DateTime();
-    
-    // Determine if event is past or future
-    $is_past = ($date < $now);
-    
-    // Randomized crowd size: between 150 and 450 fans per game
+    $is_past = (strtotime($row['event_date']) < time());
     $num_fans = rand(150, 450);
     
-    //use a large range of fake User IDs to avoid collisions
-    //assume your real user is ID 1.
-    $start_user_id = 100;
-    $end_user_id   = 5000;
-    
+    $values = [];
+    $query_parts = [];
+
     for ($i = 0; $i < $num_fans; $i++) {
-        $fake_user_id = rand($start_user_id, $end_user_id);
+        $fake_user_id = rand(100, 9999);
         
         if ($is_past) {
             $lat = $row['latitude'] ?? 39.1673;
             $lon = $row['longitude'] ?? -86.5233;
-            // Use INSERT IGNORE so we don't break if we run this twice
-            $conn->query("INSERT IGNORE INTO checkins (user_id, event_id, latitude, longitude) VALUES ($fake_user_id, $e_id, $lat, $lon)");
+            // Build the values string for one row
+            $query_parts[] = "($fake_user_id, $e_id, $lat, $lon)";
         } else {
-            $seat = "Sec " . rand(100, 500) . ", Row " . chr(rand(65, 75));
+            $seat = "Sec " . rand(100, 500);
             $share = rand(0, 1);
-            $conn->query("INSERT IGNORE INTO rsvps (user_id, event_id, seat_number, share_seat) VALUES ($fake_user_id, $e_id, '$seat', $share)");
+            $query_parts[] = "($fake_user_id, $e_id, '$seat', $share)";
         }
-        $total_inserted++;
+
+        // When we reach batch size, execute and reset
+        if (count($query_parts) >= $batch_size) {
+            $table = $is_past ? "checkins" : "rsvps";
+            $cols = $is_past ? "(user_id, event_id, latitude, longitude)" : "(user_id, event_id, seat_number, share_seat)";
+            $sql = "INSERT IGNORE INTO $table $cols VALUES " . implode(',', $query_parts);
+            $conn->query($sql);
+            $total_inserted += count($query_parts);
+            $query_parts = [];
+        }
+    }
+
+    // Final insert for any remaining fans
+    if (!empty($query_parts)) {
+        $table = $is_past ? "checkins" : "rsvps";
+        $cols = $is_past ? "(user_id, event_id, latitude, longitude)" : "(user_id, event_id, seat_number, share_seat)";
+        $sql = "INSERT IGNORE INTO $table $cols VALUES " . implode(',', $query_parts);
+        $conn->query($sql);
+        $total_inserted += count($query_parts);
     }
 }
 
+$conn->query("COMMIT");
+
 echo "<h1>Population Complete!</h1>";
-echo "<p>Processed " . $total_inserted . " simulated fan interactions across all events.</p>";
+echo "<p>Successfully created $total_inserted fan records in record time.</p>";
 echo "<a href='checkin.php'>Return to Dashboard</a>";
 ?>
