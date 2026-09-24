@@ -301,6 +301,7 @@ $av_colors = [
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Check In - FanFest</title>
     <link rel="stylesheet" href="style.css">
     <style>
@@ -369,14 +370,114 @@ $av_colors = [
         .friend-av { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; overflow:hidden; }
         .friend-av img { width:100%; height:100%; object-fit:cover; }
         .friend-name { font-size:13px; font-weight:600; color:#2d3436; text-decoration:none; }
+
+        /* Check-in page: a quieter layout that keeps the schedule in focus. */
+        body { background:#f4f6fa; color:#172033; }
+        .hero-banner { padding:42px 24px 84px; text-align:left; margin-bottom:-46px; }
+        .hero-inner { max-width:1160px; margin:0 auto; display:flex; align-items:flex-end; justify-content:space-between; gap:24px; }
+        .hero-banner .hero-eyebrow { margin:0 0 10px; font-size:11px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.76); opacity:1; }
+        .hero-banner h1 { font-size:clamp(29px,3.5vw,46px); line-height:1.12; letter-spacing:-.04em; }
+        .hero-banner p.hero-copy { max-width:580px; margin:13px 0 0; color:rgba(255,255,255,.87); font-weight:400; font-size:15px; line-height:1.6; }
+        .hero-stat { min-width:148px; padding:15px 20px; border:1px solid rgba(255,255,255,.28); border-radius:18px; background:rgba(255,255,255,.13); backdrop-filter:blur(12px); }
+        .hero-stat strong { display:block; font-size:30px; line-height:1; letter-spacing:-.05em; }
+        .hero-stat span { display:block; margin-top:7px; font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.82); }
+        .main-container { width:calc(100% - 40px); max-width:1160px; margin:0 auto 60px; }
+        .card, .compact-card { border:1px solid #e8ecf3; border-radius:18px; box-shadow:0 8px 28px rgba(24,39,67,.05); }
+        .progress-card { padding:20px 24px; margin-bottom:22px; }
+        .progress-card-head { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:12px; }
+        .progress-card h2 { margin:0 0 3px; font-size:18px; letter-spacing:-.025em; }
+        .progress-card .rank-copy { font-size:13px; color:#637086; }
+        .progress-count { text-align:right; white-space:nowrap; }
+        .progress-count strong { display:block; color:<?php echo $accent; ?>; font-size:27px; line-height:1; letter-spacing:-.04em; }
+        .progress-count span { color:#64748b; font-size:11px; font-weight:700; }
+        .progress-track { height:7px; background:#e8edf5; border-radius:999px; overflow:hidden; }
+        .milestone-details { margin-top:12px; }
+        .milestone-details summary { width:max-content; cursor:pointer; color:<?php echo $accent; ?>; font-size:12px; font-weight:800; }
+        .milestone-list { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+        .milestone-list .milestone-card { min-width:105px; flex:1; }
+        .browse-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin:8px 0 18px; }
+        .browse-heading h2 { margin:0 0 3px; font-size:25px; letter-spacing:-.04em; }
+        .browse-heading p { margin:0; color:#657187; font-size:13px; }
+        .filters-container { padding:15px; margin-bottom:16px; background:#fff; border:1px solid #e8ecf3; border-radius:18px; box-shadow:0 8px 28px rgba(24,39,67,.04); gap:12px; }
+        .filters { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+        .league-btn { margin:0; padding:8px 13px; border-radius:10px; border:1px solid transparent; background:transparent; color:#617088; font-size:12px; font-weight:800; }
+        .league-btn:hover { color:#172033; background:#f0f3f8; }
+        .league-btn.active { border-color:transparent; box-shadow:0 4px 10px rgba(20,35,61,.13); }
+        .search-form { flex:0 0 210px; margin:0; }
+        .search-input { width:100% !important; box-sizing:border-box; margin:0 !important; padding:10px 13px !important; border-radius:10px !important; border:1px solid #dfe5ee !important; background:#f8fafc; color:#172033; font-size:12px; }
+        .search-input:focus { background:#fff; border-color:<?php echo $accent; ?> !important; box-shadow:0 0 0 3px rgba(9,132,227,.11); }
+        .schedule-section { margin:0 0 26px; }
+        .calendar-ribbon { gap:8px; padding:2px 2px 12px; margin:0 0 13px; }
+        .cal-day { width:auto; min-width:62px; height:68px; padding:0 12px; border:1px solid #e5eaf2; border-radius:12px; box-shadow:0 3px 10px rgba(24,39,67,.025); font-family:inherit; }
+        .cal-day:first-child { min-width:94px; }
+        .cal-day.active { box-shadow:0 7px 17px rgba(24,39,67,.15); }
+        .cal-dow { font-size:10px; letter-spacing:.09em; }
+        .cal-num { font-size:18px; }
+        .cal-day:first-child .cal-num { font-size:13px; }
+        .games-grid { grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+        .game-card { min-height:196px; padding:20px; border:1px solid #e7ebf2; border-radius:16px; box-shadow:0 5px 18px rgba(24,39,67,.035); }
+        .game-card:hover { transform:translateY(-3px); border-color:#cdd7e5; box-shadow:0 14px 30px rgba(24,39,67,.09); }
+        .game-card.checked-in { opacity:1; background:#f8fbfa; }
+        .game-card-top { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:14px; }
+        .league-pill, .checked-pill { display:inline-flex; align-items:center; border-radius:7px; padding:5px 8px; font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
+        .league-pill { color:<?php echo $accent; ?>; background:#eff5fb; }
+        .checked-pill { color:#187247; background:#e8f7ef; }
+        .game-name-link { width:100%; padding:0; margin:0 0 13px; border:0; border-radius:0; background:none; color:#172033; text-align:left; font-family:inherit; font-size:17px; line-height:1.35; letter-spacing:-.025em; }
+        .game-name-link:hover { background:none; color:<?php echo $accent; ?>; }
+        .game-meta { display:flex; flex-direction:column; gap:5px; margin-bottom:15px; color:#68768a; font-size:12px; line-height:1.45; }
+        .game-meta a { color:#68768a; font-weight:500; }
+        .game-meta a:hover { color:<?php echo $accent; ?>; }
+        .card-actions { gap:8px; border-top:1px solid #edf0f5; padding-top:14px; }
+        .btn-rsvp, .btn-checkin, .btn-attended { min-height:38px; padding:8px 10px; border-radius:9px; font-size:12px; font-family:inherit; }
+        .btn-rsvp.not-rsvped { border:1px solid #d8e1ee; background:#fff; color:#304258; }
+        .btn-rsvp.not-rsvped:hover { border-color:<?php echo $accent; ?>; background:#eef5fc; color:<?php echo $accent; ?>; }
+        .btn-rsvp.rsvped { border:1px solid #bfe5cd; }
+        .btn-checkin:hover { filter:brightness(.94); }
+        .empty-games { padding:36px 20px; text-align:center; background:#fff; border:1px solid #e8ecf3; border-radius:16px; color:#64748b; }
+        .empty-games p { margin:0 0 8px; }
+        .empty-games a { color:<?php echo $accent; ?>; font-weight:700; }
+        #no-games-msg { padding:26px; background:#fff; border:1px solid #e8ecf3; border-radius:16px; }
+        .rsvp-table-wrap { overflow-x:auto; }
+        .rsvp-section h2 { margin:0 0 16px; font-size:20px; letter-spacing:-.03em; }
+        .rsvp-section table { min-width:580px; }
+        .rsvp-section td { border-bottom:1px solid #edf0f5; }
+        :is(.league-btn,.cal-day,.game-name-link,.btn-rsvp,.btn-checkin,.milestone-details summary,.search-input):focus-visible { outline:3px solid <?php echo $accent; ?>; outline-offset:3px; }
+        @media (max-width:720px) {
+            .hero-banner { padding:32px 20px 74px; }
+            .hero-inner { align-items:flex-start; }
+            .hero-stat { min-width:88px; padding:10px 12px; border-radius:13px; }
+            .hero-stat strong { font-size:23px; }
+            .hero-stat span { font-size:9px; line-height:1.3; }
+            .hero-banner h1 { font-size:30px; }
+            .hero-banner p.hero-copy { font-size:13px; }
+            .main-container { width:calc(100% - 28px); }
+            .progress-card { padding:17px; }
+            .filters-container { display:block; padding:12px; }
+            .filters { flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin; }
+            .league-btn { flex-shrink:0; }
+            .search-form { display:block; margin-top:10px; }
+            .games-grid { grid-template-columns:1fr; }
+            .game-card { min-height:0; }
+        }
+        @media (max-width:420px) { .hero-stat { display:none; } }
+        @media (prefers-reduced-motion:reduce) { .game-card,.cal-day,.league-btn { transition:none; } }
     </style>
 </head>
 <body>
 <?php include 'header.php'; ?>
 
 <div class="hero-banner">
-    <h1>Welcome, <?php echo htmlspecialchars($user_name); ?>!</h1>
-    <p>Verify your location to earn your attendance badges.</p>
+    <div class="hero-inner">
+        <div>
+            <p class="hero-eyebrow">FanFest / Game day</p>
+            <h1>Find your next game, <?php echo htmlspecialchars($user_name); ?>.</h1>
+            <p class="hero-copy">See what's coming up, make plans with friends, and check in when you get there.</p>
+        </div>
+        <div class="hero-stat" aria-label="<?php echo count($all_games); ?> games currently shown">
+            <strong><?php echo count($all_games); ?></strong>
+            <span>Games to explore</span>
+        </div>
+    </div>
 </div>
 
 <div class="main-container">
@@ -387,11 +488,11 @@ $av_colors = [
         </div>
     <?php endif; ?>
 
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+    <div class="card progress-card">
+        <div class="progress-card-head">
             <div>
-                <h2 style="margin:0 0 2px;">Milestones</h2>
-                <div style="font-size:0.9em; color:#636e72;">
+                <h2>Your fan progress</h2>
+                <div class="rank-copy">
                     <?php if ($current_level): ?>
                         Current rank: <strong><?php echo $current_level['icon'] . ' ' . $current_level['title']; ?></strong>
                     <?php else: ?>
@@ -399,9 +500,9 @@ $av_colors = [
                     <?php endif; ?>
                 </div>
             </div>
-            <div style="text-align:right;">
-                <span style="font-size:2em; font-weight:800; color:<?php echo $accent; ?>;"><?php echo $checkin_count; ?></span>
-                <span style="font-size:0.85em; color:#888; display:block; margin-top:-4px;">check-ins</span>
+            <div class="progress-count">
+                <strong><?php echo $checkin_count; ?></strong>
+                <span>check-ins</span>
             </div>
         </div>
 
@@ -411,20 +512,22 @@ $av_colors = [
                     <span><?php echo $checkin_count; ?> / <?php echo $next_target; ?> check-ins to <strong><?php echo $next_title; ?></strong></span>
                     <span><?php echo $pct; ?>%</span>
                 </div>
-                <div style="background:#e0e0e0; height:10px; border-radius:10px; overflow:hidden;">
+                <div class="progress-track">
                     <div class="progress-bar-fill" style="width:<?php echo $pct; ?>%;"></div>
                 </div>
             </div>
         <?php else: ?>
             <div style="margin-bottom:8px;">
                 <div style="font-size:0.8em; color:#888; margin-bottom:5px;">You've reached the top rank! 🐐</div>
-                <div style="background:#e0e0e0; height:10px; border-radius:10px; overflow:hidden;">
+                <div class="progress-track">
                     <div class="progress-bar-fill" style="width:100%;"></div>
                 </div>
             </div>
         <?php endif; ?>
 
-        <div style="display:flex; gap:8px; margin-top:18px; flex-wrap:wrap;">
+        <details class="milestone-details">
+            <summary>View badges</summary>
+            <div class="milestone-list">
             <?php foreach($milestones as $target => $ms):
                 if ($checkin_count >= $target) $cls = 'unlocked';
                 else $cls = 'locked';
@@ -435,7 +538,8 @@ $av_colors = [
                     <small style="font-size:0.7em; color:#aaa;"><?php echo $target; ?> games</small>
                 </div>
             <?php endforeach; ?>
-        </div>
+            </div>
+        </details>
     </div>
 
     <!-- Location-Based Venues -->
@@ -446,33 +550,40 @@ $av_colors = [
         </div>
     </div>
 
+    <div class="browse-heading">
+        <div>
+            <h2>Upcoming games</h2>
+            <p><span id="results-count"><?php echo count($all_games); ?> game<?php echo count($all_games) === 1 ? '' : 's'; ?></span> in the upcoming schedule</p>
+        </div>
+    </div>
+
     <div class="filters-container">
         <div class="filters" style="margin-bottom:0;">
             <?php foreach($valid_leagues as $l): ?>
                 <a href="checkin.php?league=<?php echo $l; ?>&search=<?php echo urlencode($search_query); ?>" class="league-btn <?php echo ($league_filter==$l)?'active':''; ?>"><?php echo $l; ?></a>
             <?php endforeach; ?>
         </div>
-        <form action="checkin.php" method="GET" style="display:flex;">
+        <form action="checkin.php" method="GET" class="search-form">
             <input type="hidden" name="league" value="<?php echo htmlspecialchars($league_filter); ?>">
-            <input type="text" name="search" class="search-input" placeholder="Search team" value="<?php echo htmlspecialchars($search_query); ?>">
+            <input type="search" name="search" class="search-input" aria-label="Search teams" placeholder="Search teams…" value="<?php echo htmlspecialchars($search_query); ?>">
         </form>
     </div>
 
     <!-- CALENDAR UI -->
-    <div class="card" style="background: transparent; box-shadow: none; padding: 0;">
+    <section class="schedule-section" aria-label="Upcoming game schedule">
         
         <?php if (!empty($calendar_dates)): ?>
             <!-- Horizontal Date Scroller -->
             <div class="calendar-ribbon">
-                <div class="cal-day active" data-filter="all" onclick="filterByDate('all')">
+                <button type="button" class="cal-day active" data-filter="all" onclick="filterByDate('all')" aria-pressed="true">
                     <span class="cal-dow">ALL</span>
                     <span class="cal-num">Games</span>
-                </div>
+                </button>
                 <?php foreach($calendar_dates as $d): ?>
-                <div class="cal-day" data-filter="<?php echo $d['ymd']; ?>" onclick="filterByDate('<?php echo $d['ymd']; ?>')">
+                <button type="button" class="cal-day" data-filter="<?php echo $d['ymd']; ?>" onclick="filterByDate('<?php echo $d['ymd']; ?>')" aria-pressed="false" aria-label="Show games on <?php echo $d['ymd']; ?>">
                     <span class="cal-dow"><?php echo $d['dow']; ?></span>
                     <span class="cal-num"><?php echo $d['day']; ?></span>
-                </div>
+                </button>
                 <?php endforeach; ?>
             </div>
 
@@ -485,23 +596,23 @@ $av_colors = [
                 ?>
                     <div class="game-card <?php echo $done ? 'checked-in' : ''; ?>" data-ymd="<?php echo $row['ymd']; ?>">
                         <div>
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <span style="background:#f1f5f9; padding:3px 8px; border-radius:6px; font-weight:700; font-size:0.7em; text-transform:uppercase; color:#475569;">
+                            <div class="game-card-top">
+                                <span class="league-pill">
                                     <?php echo htmlspecialchars($row['league'] ?? 'N/A'); ?>
                                 </span>
                                 <?php if($done): ?>
-                                    <span style="color:green;font-size:0.8em;font-weight:700;">✓ Checked In</span>
+                                    <span class="checked-pill">✓ Checked in</span>
                                 <?php endif; ?>
                             </div>
                             
-                            <span class="game-name-link" onclick="openGameModal(<?php echo $row['event_id']; ?>)">
+                            <button type="button" class="game-name-link" onclick="openGameModal(<?php echo $row['event_id']; ?>)">
                                 <?php echo htmlspecialchars($row['event_name']); ?>
-                            </span>
+                            </button>
                             
                             <div class="game-meta">
-                                <?php echo date("D, M j · g:i A", strtotime($row['event_date'])); ?> &middot; 
+                                <span>◷ &nbsp;<?php echo date("D, M j · g:i A", strtotime($row['event_date'])); ?></span>
                                 <a href="maps.php?venue=<?php echo urlencode($row['location_name'] ?? 'TBA'); ?>">
-                                    📍 <?php echo htmlspecialchars($row['location_name'] ?? 'TBA'); ?>
+                                    📍 &nbsp;<?php echo htmlspecialchars($row['location_name'] ?? 'TBA'); ?>
                                 </a>
                             </div>
 
@@ -565,16 +676,17 @@ $av_colors = [
                 <?php endforeach; ?>
             </div>
             
-            <div id="no-games-msg" style="display:none; text-align:center; padding:40px; color:#64748b;">
+            <div id="no-games-msg" style="display:none;">
                 <p>No games scheduled for this selected date.</p>
             </div>
 
         <?php else: ?>
-            <div class="card" style="text-align: center; padding: 40px;">
-                <p style="color:#64748b; font-size: 1.1em;">No upcoming games found. Have you run <strong><a href="import_games.php">import_games.php</a></strong> today?</p>
+            <div class="empty-games">
+                <p>No games match your filters right now.</p>
+                <a href="checkin.php">View all games</a>
             </div>
         <?php endif; ?>
-    </div>
+    </section>
 
 
     <div class="card" id="trending-card" style="display:none;">
@@ -585,9 +697,10 @@ $av_colors = [
     </div>
 
  
-    <div class="card">
+    <div class="card rsvp-section">
         <h2>My RSVPs</h2>
         <?php if ($rsvp_result && $rsvp_result->num_rows > 0): ?>
+            <div class="rsvp-table-wrap">
             <table style="width:100%;">
                 <?php while($rsvp_row = $rsvp_result->fetch_assoc()): ?>
                 <tr style="border-bottom:1px solid #eee;">
@@ -611,6 +724,7 @@ $av_colors = [
                 </tr>
                 <?php endwhile; ?>
             </table>
+            </div>
         <?php else: ?>
             <p style="color:#888;">You haven't RSVPed to any upcoming events. Hit <strong>RSVP</strong> on a game above to save your spot!</p>
         <?php endif; ?>
@@ -655,9 +769,11 @@ $av_colors = [
 <script>
 
 function filterByDate(dateStr) {
-  
-    document.querySelectorAll('.cal-day').forEach(el => el.classList.remove('active'));
-    document.querySelector('.cal-day[data-filter="'+dateStr+'"]').classList.add('active');
+    document.querySelectorAll('.cal-day').forEach(el => {
+        const selected = el.dataset.filter === dateStr;
+        el.classList.toggle('active', selected);
+        el.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    });
     
     
     let visibleCount = 0;
@@ -674,6 +790,7 @@ function filterByDate(dateStr) {
     
    
     document.getElementById('no-games-msg').style.display = (visibleCount === 0) ? 'block' : 'none';
+    document.getElementById('results-count').textContent = visibleCount + (visibleCount === 1 ? ' game' : ' games');
 }
 
 const isGuestUser = <?php echo $is_guest ? 'true' : 'false'; ?>; 
