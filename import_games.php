@@ -1,12 +1,30 @@
 <?php
-// Run this file once by visiting your-url.com/import_games.php in your browser!
-set_time_limit(0); // Allow time for looping through days
-require 'db_connect.php';
+// Can run from Railway cron/CLI or from the existing manual import page.
+set_time_limit(0);
+date_default_timezone_set('America/New_York');
+ini_set('log_errors', '1');
+require_once __DIR__ . '/schedule_http.php';
 
-// Force re-import for testing
-if (file_exists('last_game_import.txt')) {
-    unlink('last_game_import.txt');
+$lock = fopen(sys_get_temp_dir() . '/fanfest-import-' . sha1(__DIR__) . '.lock', 'c');
+if (!$lock || !flock($lock, LOCK_EX | LOCK_NB)) {
+    echo 'A schedule import is already running. Please refresh the check-in page shortly.';
+    exit();
 }
+register_shutdown_function(function () use ($lock) {
+    flock($lock, LOCK_UN);
+    fclose($lock);
+});
+
+$import_errors = 0;
+$fetched_events = 0;
+function report_import_error(string $message): void {
+    global $import_errors;
+    $import_errors++;
+    error_log('[FanFest schedule] ' . $message);
+    echo '<p>Import error: ' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</p>';
+}
+try {
+require __DIR__ . '/db_connect.php';
 
 echo "<h1>Importing League Schedules...</h1>\n";
 
@@ -36,10 +54,17 @@ foreach ($leagues as $league_name => $info) {
     
     foreach ($dates_to_fetch as $date) {
         $api_url = "https://site.api.espn.com/apis/site/v2/sports/{$info['sport']}/{$info['slug']}/scoreboard?dates=$date";
-        $json = @file_get_contents($api_url);
-        
-        if ($json) {
-            $data = json_decode($json, true);
+        try {
+            $data = schedule_fetch($api_url, "$league_name schedule for $date");
+            if (!isset($data['events']) || !is_array($data['events'])) {
+                throw new RuntimeException("$league_name response is missing its events array");
+            }
+        } catch (RuntimeException $e) {
+            report_import_error($e->getMessage());
+            break; // Do not send another 13 requests to a failing league endpoint.
+        }
+        {
+            $fetched_events += count($data['events']);
             if (!empty($data['events'])) {
                 foreach ($data['events'] as $event) {
                     $name = $event['name'];
@@ -75,18 +100,25 @@ foreach ($leagues as $league_name => $info) {
 // 2. FIFA World Cup Import via football-data.org API
 echo "<p>Checking FIFA World Cup matches via football-data.org...</p>";
 
-$opts = [
-    "http" => [
-        "method" => "GET",
-        "header" => "X-Auth-Token: 377fedbb77354c3aa744fc879a9f676a\r\n"
-    ]
-];
-$context = stream_context_create($opts);
-$fifa_url = "https://api.football-data.org/v4/competitions/WC/matches";
-$fifa_json = @file_get_contents($fifa_url, false, $context);
+$fifa_token = getenv('FOOTBALL_DATA_API_TOKEN');
+$fifa_data = null;
+if ($fifa_token) {
+    try {
+        $fifa_data = schedule_fetch(
+            'https://api.football-data.org/v4/competitions/WC/matches',
+            'FIFA schedule', ['X-Auth-Token: ' . $fifa_token]
+        );
+        if (!isset($fifa_data['matches']) || !is_array($fifa_data['matches'])) {
+            throw new RuntimeException('FIFA response is missing its matches array');
+        }
+    } catch (RuntimeException $e) {
+        report_import_error($e->getMessage());
+    }
+} else {
+    echo '<p>FIFA skipped: FOOTBALL_DATA_API_TOKEN is not configured.</p>';
+}
 
-if ($fifa_json) {
-    $fifa_data = json_decode($fifa_json, true);
+if ($fifa_data) {
     if (isset($fifa_data['matches'])) {
         foreach ($fifa_data['matches'] as $match) {
             $home = $match['homeTeam']['name'] ?? 'TBD';
@@ -119,9 +151,24 @@ if ($fifa_json) {
     }
 }
 
-echo "<h3>Import Complete!</h3>";
-echo "<p>Successfully imported <strong>$inserted_count</strong> new upcoming games without deleting existing fan data.</p>";
+} catch (Throwable $e) {
+    error_log('[FanFest schedule] ' . $e->getMessage());
+    report_import_error('The import stopped while connecting to or writing the database. Check the web service logs.');
+}
+
+if ($import_errors === 0) {
+    if (file_put_contents(__DIR__ . '/last_game_import.txt', (string)time(), LOCK_EX) === false) {
+        report_import_error('Could not save the successful-import timestamp');
+    }
+}
+if ($import_errors > 0) {
+    http_response_code(502);
+    echo '<h3>Import incomplete</h3><p>The failed requests are recorded in the web service logs.</p>';
+} else {
+    echo '<h3>Import complete</h3>';
+}
+echo '<p>ESPN events received: ' . $fetched_events . '. New games inserted: ' . ($inserted_count ?? 0) . '.</p>';
 echo "<a href='checkin.php'>Return to Dashboard</a>";
+if (PHP_SAPI === 'cli' && $import_errors > 0) exit(1);
 ?>
-```eof
 

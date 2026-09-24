@@ -1,9 +1,4 @@
 <?php
-// Force re-import for testing if needed
-if (file_exists('last_game_import.txt')) {
-    unlink('last_game_import.txt');
-}
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
@@ -23,21 +18,34 @@ function calculateDistance($lat1, $lon1, $lat2, $lon2) {
     return $earth_radius * $c;
 }
 
-// Background Game Import Logic
-$last_import_file = 'last_game_import.txt';
-$should_import = false;
-if (!file_exists($last_import_file)) {
-    $should_import = true;
-} else {
-    $last_time = (int)file_get_contents($last_import_file);
-    if (time() - $last_time > 86400) $should_import = true;
-}
-if ($should_import) {
-    exec('php import_games.php > /dev/null 2>&1 &');
-    file_put_contents($last_import_file, time());
-}
-
 if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
+
+// Only the worker records successful completion. Throttle failed launch/retry attempts.
+$last_import_file = __DIR__ . '/last_game_import.txt';
+$last_success = is_file($last_import_file) ? (int)file_get_contents($last_import_file) : 0;
+if (time() - $last_success > 86400) {
+    $attempt = fopen(sys_get_temp_dir() . '/fanfest-launch-' . sha1(__DIR__) . '.lock', 'c+');
+    if ($attempt && flock($attempt, LOCK_EX | LOCK_NB)) {
+        $last_attempt = (int)stream_get_contents($attempt);
+        if (time() - $last_attempt > 300) {
+            ftruncate($attempt, 0);
+            rewind($attempt);
+            fwrite($attempt, (string)time());
+            fflush($attempt);
+            if (function_exists('exec')) {
+                $php = PHP_BINDIR . '/php';
+                $command = escapeshellarg($php) . ' -d log_errors=1 -d display_errors=0 '
+                    . escapeshellarg(__DIR__ . '/import_games.php') . ' > /dev/stderr 2>&1 &';
+                exec($command, $output, $exit_code);
+                if ($exit_code !== 0) error_log('[FanFest schedule] Unable to start import worker');
+            } else {
+                error_log('[FanFest schedule] exec is unavailable; configure a scheduled CLI import');
+            }
+        }
+        flock($attempt, LOCK_UN);
+    }
+    if ($attempt) fclose($attempt);
+}
 
 $is_guest = ($_SESSION['user_id'] === 'guest');
 $user_id = $is_guest ? 0 : $_SESSION['user_id']; 
